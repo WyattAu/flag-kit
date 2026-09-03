@@ -1,0 +1,43 @@
+[package]
+name = "flag-kit"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/WyattAu/flag-kit"
+description = "Feature flags with rollout, targeting, and audit — deterministic percentage rollout, org targeting, and change history"
+keywords = ["feature-flag", "rollout", "experiment", "targeting"]
+categories = ["config"]
+exclude = ["/target"]
+readme = "README.md"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = { version = "2", default-features = false }
+tokio = { version = "1", features = ["rt", "sync", "macros"] }
+dashmap = "6"
+async-trait = "0.1"
+chrono = { version = "0.4", features = ["serde"], optional = true }
+uuid = { version = "1", features = ["v4", "serde"], optional = true }
+tracing = { version = "0.1", optional = true }
+regex = { version = "1", optional = true }
+rusqlite = { version = "0.31", features = ["bundled"], optional = true }
+
+[dev-dependencies]
+proptest = "1"
+tokio = { version = "1", features = ["full"] }
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[features]
+default = ["std"]
+std = ["thiserror/std"]
+chrono = ["dep:chrono"]
+regex = ["dep:regex"]
+sqlite = ["dep:rusqlite"]
+tracing = ["dep:tracing"]
+uuid = ["dep:uuid"]
+
+[[bench]]
+name = "flag_bench"
+harness = false
