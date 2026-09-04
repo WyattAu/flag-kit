@@ -65,12 +65,7 @@ impl Evaluator {
     ///
     /// `org_id` is accepted for future targeting extensions; currently it is
     /// logged when `tracing` is enabled but does not affect the bucket.
-    pub async fn enabled_for(
-        &self,
-        name: &FlagName,
-        user_id: &str,
-        org_id: Option<&str>,
-    ) -> bool {
+    pub async fn enabled_for(&self, name: &FlagName, user_id: &str, org_id: Option<&str>) -> bool {
         let flag = match self.store.get(name).await {
             Some(f) => f,
             None => {
@@ -219,7 +214,10 @@ mod tests {
             .await
             .unwrap();
         for uid in ["alice", "bob", "charlie", "user_123"] {
-            assert!(eval.enabled_for(&name, uid, None).await, "uid {uid} should be enabled");
+            assert!(
+                eval.enabled_for(&name, uid, None).await,
+                "uid {uid} should be enabled"
+            );
         }
     }
 
@@ -281,10 +279,7 @@ mod tests {
             .unwrap();
         let mut enabled = 0;
         for i in 0..1000 {
-            if eval
-                .enabled_for(&name, &format!("user_{i}"), None)
-                .await
-            {
+            if eval.enabled_for(&name, &format!("user_{i}"), None).await {
                 enabled += 1;
             }
         }
@@ -315,7 +310,10 @@ mod tests {
         for i in 0..20 {
             buckets.insert(bucket("flag", &format!("user{i}")));
         }
-        assert!(buckets.len() > 1, "different users should produce different buckets");
+        assert!(
+            buckets.len() > 1,
+            "different users should produce different buckets"
+        );
     }
 
     #[tokio::test]

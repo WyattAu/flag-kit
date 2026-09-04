@@ -84,8 +84,14 @@ async fn memory_store_list() {
     let store = MemoryFlagStore::new();
     let n1 = FlagName::new("flag_a").unwrap();
     let n2 = FlagName::new("flag_b").unwrap();
-    store.set(Flag::new(n1.clone(), true, 10).unwrap()).await.unwrap();
-    store.set(Flag::new(n2.clone(), false, 90).unwrap()).await.unwrap();
+    store
+        .set(Flag::new(n1.clone(), true, 10).unwrap())
+        .await
+        .unwrap();
+    store
+        .set(Flag::new(n2.clone(), false, 90).unwrap())
+        .await
+        .unwrap();
     let mut list = store.list().await;
     list.sort_by(|a, b| a.name.cmp(&b.name));
     assert_eq!(list.len(), 2);
@@ -97,8 +103,14 @@ async fn memory_store_list() {
 async fn memory_store_overwrite() {
     let store = MemoryFlagStore::new();
     let name = FlagName::new("overwrite").unwrap();
-    store.set(Flag::new(name.clone(), true, 10).unwrap()).await.unwrap();
-    store.set(Flag::new(name.clone(), false, 99).unwrap()).await.unwrap();
+    store
+        .set(Flag::new(name.clone(), true, 10).unwrap())
+        .await
+        .unwrap();
+    store
+        .set(Flag::new(name.clone(), false, 99).unwrap())
+        .await
+        .unwrap();
     let got = store.get(&name).await.unwrap();
     assert!(!got.enabled);
     assert_eq!(got.percentage, 99);
@@ -108,7 +120,10 @@ async fn memory_store_overwrite() {
 async fn memory_store_delete() {
     let store = MemoryFlagStore::new();
     let name = FlagName::new("deletable").unwrap();
-    store.set(Flag::new(name.clone(), true, 50).unwrap()).await.unwrap();
+    store
+        .set(Flag::new(name.clone(), true, 50).unwrap())
+        .await
+        .unwrap();
     assert!(store.delete(&name).await.unwrap());
     assert!(store.get(&name).await.is_none());
     assert!(!store.delete(&name).await.unwrap());
@@ -123,10 +138,16 @@ async fn evaluator_global_enabled() {
     let store = Arc::new(MemoryFlagStore::new());
     let eval = Evaluator::new(store.clone());
     let name = FlagName::new("global_flag").unwrap();
-    store.set(Flag::new(name.clone(), true, 0).unwrap()).await.unwrap();
+    store
+        .set(Flag::new(name.clone(), true, 0).unwrap())
+        .await
+        .unwrap();
     assert!(eval.enabled(&name).await);
     // even with 0% rollout, global check is true (percentage ignored)
-    store.set(Flag::new(name.clone(), false, 100).unwrap()).await.unwrap();
+    store
+        .set(Flag::new(name.clone(), false, 100).unwrap())
+        .await
+        .unwrap();
     assert!(!eval.enabled(&name).await);
 }
 
@@ -148,7 +169,10 @@ async fn evaluator_rollout_100_always_true() {
     let store = Arc::new(MemoryFlagStore::new());
     let eval = Evaluator::new(store.clone());
     let name = FlagName::new("full").unwrap();
-    store.set(Flag::new(name.clone(), true, 100).unwrap()).await.unwrap();
+    store
+        .set(Flag::new(name.clone(), true, 100).unwrap())
+        .await
+        .unwrap();
     for uid in ["alice", "bob", "charlie"] {
         assert!(eval.enabled_for(&name, uid, None).await);
         assert!(eval.enabled_for(&name, uid, Some("org1")).await);
@@ -160,7 +184,10 @@ async fn evaluator_rollout_0_always_false() {
     let store = Arc::new(MemoryFlagStore::new());
     let eval = Evaluator::new(store.clone());
     let name = FlagName::new("none").unwrap();
-    store.set(Flag::new(name.clone(), true, 0).unwrap()).await.unwrap();
+    store
+        .set(Flag::new(name.clone(), true, 0).unwrap())
+        .await
+        .unwrap();
     for uid in ["alice", "bob"] {
         assert!(!eval.enabled_for(&name, uid, None).await);
     }
@@ -171,7 +198,10 @@ async fn evaluator_rollout_disabled_flag_false() {
     let store = Arc::new(MemoryFlagStore::new());
     let eval = Evaluator::new(store.clone());
     let name = FlagName::new("disabled").unwrap();
-    store.set(Flag::new(name.clone(), false, 100).unwrap()).await.unwrap();
+    store
+        .set(Flag::new(name.clone(), false, 100).unwrap())
+        .await
+        .unwrap();
     assert!(!eval.enabled_for(&name, "any_user", None).await);
 }
 
@@ -180,7 +210,10 @@ async fn evaluator_rollout_deterministic() {
     let store = Arc::new(MemoryFlagStore::new());
     let eval = Evaluator::new(store.clone());
     let name = FlagName::new("determ").unwrap();
-    store.set(Flag::new(name.clone(), true, 50).unwrap()).await.unwrap();
+    store
+        .set(Flag::new(name.clone(), true, 50).unwrap())
+        .await
+        .unwrap();
     let uid = "stable_user";
     let first = eval.enabled_for(&name, uid, None).await;
     for _ in 0..10 {
@@ -196,7 +229,10 @@ async fn evaluator_rollout_org_id_still_deterministic() {
     let store = Arc::new(MemoryFlagStore::new());
     let eval = Evaluator::new(store.clone());
     let name = FlagName::new("org_flag").unwrap();
-    store.set(Flag::new(name.clone(), true, 50).unwrap()).await.unwrap();
+    store
+        .set(Flag::new(name.clone(), true, 50).unwrap())
+        .await
+        .unwrap();
     let a = eval.enabled_for(&name, "alice", None).await;
     let b = eval.enabled_for(&name, "alice", Some("org1")).await;
     assert_eq!(a, b, "org should not affect bucket per spec");
@@ -206,11 +242,23 @@ async fn evaluator_rollout_org_id_still_deterministic() {
 async fn evaluator_bulk() {
     let store = Arc::new(MemoryFlagStore::new());
     let eval = Evaluator::new(store.clone());
-    store.set(Flag::new(FlagName::new("flag_a").unwrap(), true, 100).unwrap()).await.unwrap();
-    store.set(Flag::new(FlagName::new("flag_b").unwrap(), true, 0).unwrap()).await.unwrap();
-    store.set(Flag::new(FlagName::new("flag_c").unwrap(), false, 100).unwrap()).await.unwrap();
+    store
+        .set(Flag::new(FlagName::new("flag_a").unwrap(), true, 100).unwrap())
+        .await
+        .unwrap();
+    store
+        .set(Flag::new(FlagName::new("flag_b").unwrap(), true, 0).unwrap())
+        .await
+        .unwrap();
+    store
+        .set(Flag::new(FlagName::new("flag_c").unwrap(), false, 100).unwrap())
+        .await
+        .unwrap();
     let results = eval.enabled_for_all("user1", None).await;
-    let map: std::collections::HashMap<_, _> = results.into_iter().map(|(n, v)| (n.to_string(), v)).collect();
+    let map: std::collections::HashMap<_, _> = results
+        .into_iter()
+        .map(|(n, v)| (n.to_string(), v))
+        .collect();
     assert_eq!(map["flag_a"], true);
     assert_eq!(map["flag_b"], false);
     assert_eq!(map["flag_c"], false);
@@ -239,7 +287,13 @@ fn flag_name_serde() {
 
 #[test]
 fn flag_change_serde() {
-    let c = FlagChange::new(FlagName::new("my_flag").unwrap(), false, true, "alice", 12345);
+    let c = FlagChange::new(
+        FlagName::new("my_flag").unwrap(),
+        false,
+        true,
+        "alice",
+        12345,
+    );
     let json = serde_json::to_string(&c).unwrap();
     let parsed: FlagChange = serde_json::from_str(&json).unwrap();
     assert_eq!(c, parsed);
@@ -254,7 +308,10 @@ mod sqlite_integration {
     async fn sqlite_set_get_list_delete() {
         let store = SqliteFlagStore::in_memory().unwrap();
         let name = FlagName::new("sqlite_a").unwrap();
-        store.set(Flag::new(name.clone(), true, 77).unwrap()).await.unwrap();
+        store
+            .set(Flag::new(name.clone(), true, 77).unwrap())
+            .await
+            .unwrap();
         let got = store.get(&name).await.unwrap();
         assert_eq!(got.percentage, 77);
         let list = store.list().await;
@@ -268,7 +325,10 @@ mod sqlite_integration {
         let store = Arc::new(SqliteFlagStore::in_memory().unwrap());
         let eval = Evaluator::new(store.clone());
         let name = FlagName::new("sqlite_rollout").unwrap();
-        store.set(Flag::new(name.clone(), true, 100).unwrap()).await.unwrap();
+        store
+            .set(Flag::new(name.clone(), true, 100).unwrap())
+            .await
+            .unwrap();
         assert!(eval.enabled(&name).await);
         assert!(eval.enabled_for(&name, "user1", None).await);
     }

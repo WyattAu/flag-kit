@@ -33,12 +33,12 @@
 
 /// Error types.
 pub mod error;
+/// Evaluation logic.
+pub mod eval;
 /// Flag types.
 pub mod flag;
 /// Storage backends.
 pub mod store;
-/// Evaluation logic.
-pub mod eval;
 
 pub use error::{FlagError, Result};
 pub use eval::{bucket, bucket_with_org, Evaluator};

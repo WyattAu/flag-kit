@@ -1,8 +1,8 @@
 //! Flag types: `FlagName`, `Flag`, and `FlagChange`.
 
-use serde::{Deserialize, Serialize};
 use core::fmt;
 use core::str::FromStr;
+use serde::{Deserialize, Serialize};
 
 use crate::error::FlagError;
 
@@ -53,9 +53,8 @@ impl FlagName {
             // Compile once lazily. Use std::sync::OnceLock.
             use std::sync::OnceLock;
             static RE: OnceLock<regex::Regex> = OnceLock::new();
-            let re = RE.get_or_init(|| {
-                regex::Regex::new(r"^[a-z][a-z0-9_]*$").expect("valid regex")
-            });
+            let re =
+                RE.get_or_init(|| regex::Regex::new(r"^[a-z][a-z0-9_]*$").expect("valid regex"));
             if !re.is_match(s) {
                 return Err(FlagError::invalid_name(
                     s,
@@ -69,7 +68,7 @@ impl FlagName {
         {
             let mut chars = s.chars();
             match chars.next() {
-                Some(c) if c.is_ascii_lowercase() => {},
+                Some(c) if c.is_ascii_lowercase() => {}
                 _ => {
                     return Err(FlagError::invalid_name(
                         s,
@@ -157,11 +156,7 @@ impl Flag {
     /// # Errors
     /// Returns `FlagError::Storage` if percentage out of range (misuse), or
     /// `FlagError::InvalidName` is not applicable here (name already validated).
-    pub fn new(
-        name: FlagName,
-        enabled: bool,
-        percentage: u8,
-    ) -> Result<Self, FlagError> {
+    pub fn new(name: FlagName, enabled: bool, percentage: u8) -> Result<Self, FlagError> {
         if percentage > 100 {
             return Err(FlagError::Storage(format!(
                 "percentage must be 0..=100, got {percentage}"
@@ -235,13 +230,7 @@ pub struct FlagChange {
 
 impl FlagChange {
     /// Creates a new `FlagChange` record.
-    pub fn new(
-        name: FlagName,
-        old: bool,
-        new: bool,
-        who: impl Into<String>,
-        when: i64,
-    ) -> Self {
+    pub fn new(name: FlagName, old: bool, new: bool, who: impl Into<String>, when: i64) -> Self {
         Self {
             name,
             old,
@@ -288,7 +277,10 @@ mod tests {
     #[test]
     fn flag_name_invalid() {
         for invalid in ["", "A", "1abc", "_abc", "abc-def", "abc def", "ABC"] {
-            assert!(FlagName::new(invalid).is_err(), "should be invalid: {invalid}");
+            assert!(
+                FlagName::new(invalid).is_err(),
+                "should be invalid: {invalid}"
+            );
         }
     }
 

@@ -65,10 +65,7 @@ fn bench_memory_store(c: &mut Criterion) {
             let store = MemoryFlagStore::new();
             for i in 0..100 {
                 let name = FlagName::new(format!("flag_{i}")).unwrap();
-                store
-                    .set(Flag::new(name, true, 50).unwrap())
-                    .await
-                    .unwrap();
+                store.set(Flag::new(name, true, 50).unwrap()).await.unwrap();
             }
             let list = store.list().await;
             std::hint::black_box(list);
@@ -115,10 +112,7 @@ fn bench_evaluator(c: &mut Criterion) {
             let store = Arc::new(MemoryFlagStore::new());
             for i in 0..100 {
                 let name = FlagName::new(format!("flag_{i}")).unwrap();
-                store
-                    .set(Flag::new(name, true, 50).unwrap())
-                    .await
-                    .unwrap();
+                store.set(Flag::new(name, true, 50).unwrap()).await.unwrap();
             }
             let eval = Evaluator::new(store);
             let v = eval.enabled_for_all("user_999", None).await;

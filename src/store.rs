@@ -124,7 +124,8 @@ impl SqliteFlagStore {
     ///
     /// Creates the `flags` table if it does not exist.
     pub fn new(path: impl AsRef<Path>) -> Result<Self> {
-        let conn = rusqlite::Connection::open(path.as_ref()).map_err(|e| FlagError::Storage(e.to_string()))?;
+        let conn = rusqlite::Connection::open(path.as_ref())
+            .map_err(|e| FlagError::Storage(e.to_string()))?;
         Self::init(&conn)?;
         Ok(Self {
             conn: Arc::new(tokio::sync::Mutex::new(conn)),
@@ -133,7 +134,8 @@ impl SqliteFlagStore {
 
     /// Creates an in-memory SQLite database (useful for tests).
     pub fn in_memory() -> Result<Self> {
-        let conn = rusqlite::Connection::open_in_memory().map_err(|e| FlagError::Storage(e.to_string()))?;
+        let conn = rusqlite::Connection::open_in_memory()
+            .map_err(|e| FlagError::Storage(e.to_string()))?;
         Self::init(&conn)?;
         Ok(Self {
             conn: Arc::new(tokio::sync::Mutex::new(conn)),
@@ -294,10 +296,11 @@ impl FlagStore for SqliteFlagStore {
     async fn list(&self) -> Vec<Flag> {
         let conn = self.conn.clone();
         let guard = conn.lock().await;
-        let mut stmt = match guard.prepare("SELECT name, enabled, percentage, created_at FROM flags") {
-            Ok(s) => s,
-            Err(_) => return Vec::new(),
-        };
+        let mut stmt =
+            match guard.prepare("SELECT name, enabled, percentage, created_at FROM flags") {
+                Ok(s) => s,
+                Err(_) => return Vec::new(),
+            };
         let rows = match stmt.query_map([], |row| {
             let name_s: String = row.get(0)?;
             let enabled: i64 = row.get(1)?;
@@ -338,7 +341,10 @@ impl FlagStore for SqliteFlagStore {
         let conn = self.conn.clone();
         let guard = conn.lock().await;
         let n = guard
-            .execute("DELETE FROM flags WHERE name = ?1", rusqlite::params![name.as_str()])
+            .execute(
+                "DELETE FROM flags WHERE name = ?1",
+                rusqlite::params![name.as_str()],
+            )
             .map_err(|e| FlagError::Storage(e.to_string()))?;
         Ok(n > 0)
     }
@@ -376,8 +382,14 @@ mod tests {
     async fn memory_store_overwrite() {
         let store = MemoryFlagStore::new();
         let name = FlagName::new("overwrite").unwrap();
-        store.set(Flag::new(name.clone(), true, 10).unwrap()).await.unwrap();
-        store.set(Flag::new(name.clone(), false, 90).unwrap()).await.unwrap();
+        store
+            .set(Flag::new(name.clone(), true, 10).unwrap())
+            .await
+            .unwrap();
+        store
+            .set(Flag::new(name.clone(), false, 90).unwrap())
+            .await
+            .unwrap();
         let got = store.get(&name).await.unwrap();
         assert!(!got.enabled);
         assert_eq!(got.percentage, 90);
