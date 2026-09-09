@@ -359,6 +359,11 @@ impl core::fmt::Debug for SqliteFlagStore {
 
 #[cfg(test)]
 mod tests {
+    #![allow(
+        clippy::unwrap_used,
+        clippy::expect_used,
+        clippy::bool_assert_comparison
+    )] // test assertions unwrap by design
     use super::*;
     use crate::flag::FlagName;
 

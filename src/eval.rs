@@ -113,9 +113,7 @@ impl Evaluator {
         let flags = self.store.list().await;
         let mut out = Vec::with_capacity(flags.len());
         for flag in flags {
-            let enabled = if !flag.enabled {
-                false
-            } else if flag.percentage == 0 {
+            let enabled = if !flag.enabled || flag.percentage == 0 {
                 false
             } else if flag.percentage == 100 {
                 true
@@ -161,6 +159,11 @@ pub fn bucket_with_org(flag_name: &str, user_id: &str, org_id: Option<&str>) -> 
 
 #[cfg(test)]
 mod tests {
+    #![allow(
+        clippy::unwrap_used,
+        clippy::expect_used,
+        clippy::bool_assert_comparison
+    )] // test assertions unwrap by design
     use super::*;
     use crate::flag::{Flag, FlagName};
     use crate::store::MemoryFlagStore;
@@ -303,9 +306,8 @@ mod tests {
         let b1 = bucket("flag", "user1");
         let b2 = bucket("flag", "user1");
         assert_eq!(b1, b2);
-        let b3 = bucket("flag", "user2");
-        // very likely different, but not guaranteed; test that at least some users differ
-        // Use a set
+        // Individual users are very likely to differ, but not guaranteed;
+        // assert that at least some users in a set produce distinct buckets.
         let mut buckets = std::collections::HashSet::new();
         for i in 0..20 {
             buckets.insert(bucket("flag", &format!("user{i}")));

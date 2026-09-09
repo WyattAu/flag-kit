@@ -1,3 +1,6 @@
+// Tests assert invariants directly; unwraps keep failures loud.
+#![allow(clippy::unwrap_used, clippy::expect_used)]
+
 //! Property-based tests for flag-kit
 
 use flag_kit::{Flag, FlagName};

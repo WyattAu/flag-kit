@@ -1,5 +1,11 @@
+// Tests/benches assert invariants directly; unwraps keep failures loud.
+#![allow(
+    clippy::unwrap_used,
+    clippy::expect_used,
+    clippy::bool_assert_comparison
+)]
 use criterion::{criterion_group, criterion_main, Criterion};
-use flag_kit::{Evaluator, Flag, FlagName, MemoryFlagStore};
+use flag_kit::{Evaluator, Flag, FlagName, FlagStore, MemoryFlagStore};
 use std::sync::Arc;
 
 fn bench_flag_name_validation(c: &mut Criterion) {
@@ -12,7 +18,7 @@ fn bench_flag_name_validation(c: &mut Criterion) {
     c.bench_function("flag_name_new_invalid", |b| {
         b.iter(|| {
             let r = FlagName::new("Invalid-Flag");
-            std::hint::black_box(r);
+            let _ = std::hint::black_box(r);
         });
     });
 }

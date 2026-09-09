@@ -53,6 +53,8 @@ impl FlagName {
             // Compile once lazily. Use std::sync::OnceLock.
             use std::sync::OnceLock;
             static RE: OnceLock<regex::Regex> = OnceLock::new();
+            // The pattern is a fixed literal known to be valid regex.
+            #[allow(clippy::expect_used)]
             let re =
                 RE.get_or_init(|| regex::Regex::new(r"^[a-z][a-z0-9_]*$").expect("valid regex"));
             if !re.is_match(s) {
@@ -61,7 +63,7 @@ impl FlagName {
                     "must match ^[a-z][a-z0-9_]*$ (lowercase snake_case, start with letter)",
                 ));
             }
-            return Ok(());
+            Ok(())
         }
 
         #[cfg(not(feature = "regex"))]
@@ -265,6 +267,11 @@ impl FlagChange {
 
 #[cfg(test)]
 mod tests {
+    #![allow(
+        clippy::unwrap_used,
+        clippy::expect_used,
+        clippy::bool_assert_comparison
+    )] // test assertions unwrap by design
     use super::*;
 
     #[test]

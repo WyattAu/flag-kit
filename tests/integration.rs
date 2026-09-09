@@ -1,3 +1,10 @@
+// Tests assert invariants directly; unwraps keep failures loud.
+#![allow(
+    clippy::unwrap_used,
+    clippy::expect_used,
+    clippy::bool_assert_comparison
+)]
+
 //! Integration tests for flag-kit
 
 use flag_kit::{Evaluator, Flag, FlagChange, FlagName, FlagStore, MemoryFlagStore};

@@ -1,4 +1,6 @@
-#![cfg_attr(not(feature = "std"), no_std)]
+// NOTE: the `std` feature is kept as a compatibility no-op; the crate's
+// dependencies (tokio, dashmap, async-trait) require std, so a no_std build
+// is not currently supported despite the feature knob.
 #![forbid(unsafe_code)]
 #![deny(missing_docs)]
 
