@@ -41,3 +41,7 @@ uuid = ["dep:uuid"]
 [[bench]]
 name = "flag_bench"
 harness = false
+
+[lints.clippy]
+unwrap_used = "warn"
+expect_used = "warn"
