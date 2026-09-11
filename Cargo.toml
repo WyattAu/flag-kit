@@ -19,7 +19,6 @@ tokio = { version = "1", features = ["rt", "sync", "macros"] }
 dashmap = "6"
 async-trait = "0.1"
 chrono = { version = "0.4", features = ["serde"], optional = true }
-uuid = { version = "1", features = ["v4", "serde"], optional = true }
 tracing = { version = "0.1", optional = true }
 regex = { version = "1", optional = true }
 rusqlite = { version = "0.32", features = ["bundled"], optional = true }
@@ -36,7 +35,6 @@ chrono = ["dep:chrono"]
 regex = ["dep:regex"]
 sqlite = ["dep:rusqlite"]
 tracing = ["dep:tracing"]
-uuid = ["dep:uuid"]
 
 [[bench]]
 name = "flag_bench"
