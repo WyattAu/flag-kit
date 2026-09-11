@@ -35,6 +35,7 @@ chrono = ["dep:chrono"]
 regex = ["dep:regex"]
 sqlite = ["dep:rusqlite"]
 tracing = ["dep:tracing"]
+uuid = []
 
 [[bench]]
 name = "flag_bench"
