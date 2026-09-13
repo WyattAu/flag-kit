@@ -5,6 +5,31 @@ Changelog](https://keepachangelog.com/) — versions follow [semver](https://sem
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-09-13
+
+### Changed
+
+- **Flag-name validation is now delegated to `validkit::FlagName`**
+  (dogfooding): the local ~40-line duplicate of the
+  `^[a-z][a-z0-9_]*$` rule — hand-rolled char loop plus a second
+  regex-engine copy behind the `regex` feature — is deleted. The
+  accept/reject set is unchanged and now pinned equal to validkit's by
+  `tests/equivalence.rs` (historical oracle sets, exhaustive 1-char
+  ASCII sweep, exhaustive 2-char mixed-alphabet sweep, structured
+  adversarial cases, ordering parity) under all feature combinations.
+
+### Added
+
+- `validkit` dependency (>= 1.3.1) as the single source of truth for
+  flag-name validation.
+
+### Removed
+
+- The direct `regex` dependency. The `regex` feature remains, now
+  forwarding to `validkit/regex` (regex-backed validation inside
+  validkit); enabling it no longer links a second regex engine into
+  flag-kit itself.
+
 ## [0.1.2] - 2026-09-12
 
 ### Added

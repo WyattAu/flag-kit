@@ -42,52 +42,17 @@ impl FlagName {
     }
 
     /// Validates a candidate name.
+    ///
+    /// The rule (`^[a-z][a-z0-9_]*$`) is owned by `validkit::FlagName`;
+    /// this crate no longer carries its own copy. The accept/reject set is
+    /// pinned equal to validkit's by `tests/equivalence.rs`.
     fn validate(s: &str) -> Result<(), FlagError> {
-        if s.is_empty() {
-            return Err(FlagError::invalid_name(s, "flag name must not be empty"));
-        }
-
-        // If regex feature enabled, use regex for canonical validation.
-        #[cfg(feature = "regex")]
-        {
-            // Compile once lazily. Use std::sync::OnceLock.
-            use std::sync::OnceLock;
-            static RE: OnceLock<regex::Regex> = OnceLock::new();
-            // The pattern is a fixed literal known to be valid regex.
-            #[allow(clippy::expect_used)]
-            let re =
-                RE.get_or_init(|| regex::Regex::new(r"^[a-z][a-z0-9_]*$").expect("valid regex"));
-            if !re.is_match(s) {
-                return Err(FlagError::invalid_name(
-                    s,
-                    "must match ^[a-z][a-z0-9_]*$ (lowercase snake_case, start with letter)",
-                ));
-            }
-            Ok(())
-        }
-
-        #[cfg(not(feature = "regex"))]
-        {
-            let mut chars = s.chars();
-            match chars.next() {
-                Some(c) if c.is_ascii_lowercase() => {}
-                _ => {
-                    return Err(FlagError::invalid_name(
-                        s,
-                        "must start with lowercase letter a-z",
-                    ))
-                }
-            }
-            for c in chars {
-                if !(c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_') {
-                    return Err(FlagError::invalid_name(
-                        s,
-                        "must match ^[a-z][a-z0-9_]*$ (lowercase snake_case)",
-                    ));
-                }
-            }
-            Ok(())
-        }
+        validkit::FlagName::parse(s).map(|_| ()).map_err(|_| {
+            FlagError::invalid_name(
+                s,
+                "must match ^[a-z][a-z0-9_]*$ (lowercase snake_case, start with letter)",
+            )
+        })
     }
 }
 

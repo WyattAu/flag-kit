@@ -1,6 +1,6 @@
 [package]
 name = "flag-kit"
-version = "0.1.2"
+version = "0.2.0"
 edition = "2021"
 rust-version = "1.85"
 license = "MIT OR Apache-2.0"
@@ -20,7 +20,9 @@ dashmap = "6"
 async-trait = "0.1"
 chrono = { version = "0.4", features = ["serde"], optional = true }
 tracing = { version = "0.1", optional = true }
-regex = { version = "1", optional = true }
+# Flag-name validation is delegated to validkit::FlagName (single source
+# of truth for the `^[a-z][a-z0-9_]*$` rule across the workspace).
+validkit = "1.3.1"
 rusqlite = { version = "0.32", features = ["bundled"], optional = true }
 
 [dev-dependencies]
@@ -32,7 +34,9 @@ criterion = { version = "0.5", features = ["html_reports", "async_tokio"] }
 default = ["std"]
 std = ["thiserror/std"]
 chrono = ["dep:chrono"]
-regex = ["dep:regex"]
+# Regex-backed validation inside validkit (flag-kit no longer carries its
+# own regex engine; this forwards to `validkit/regex`).
+regex = ["validkit/regex"]
 sqlite = ["dep:rusqlite"]
 tracing = ["dep:tracing"]
 uuid = []
