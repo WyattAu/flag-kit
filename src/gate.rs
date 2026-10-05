@@ -391,6 +391,26 @@ impl HealthGate {
         Ok(self.stage())
     }
 
+    /// Restores a previously recorded consecutive-failure count.
+    ///
+    /// Gate state has to survive a restart when a caller persists it. Without
+    /// this, a rollout that was two bad windows away from rolling back would
+    /// come back with a clean streak and promote on its first healthy window
+    /// — the automation would undo its own decision.
+    pub fn restore_streak(&mut self, consecutive_failures: u32) {
+        self.consecutive_failures = consecutive_failures;
+    }
+
+    /// Restores a previously recorded stage position.
+    ///
+    /// Returns the stage actually restored, clamped to the configured range:
+    /// a persisted index past the end (stage list shortened between releases)
+    /// lands on the last stage rather than panicking.
+    pub fn restore_stage(&mut self, stage_index: usize) -> &Stage {
+        self.stage_index = stage_index.min(self.stages.len() - 1);
+        self.stage()
+    }
+
     /// Returns to the first stage, keeping the configured stages intact.
     pub fn restart(&mut self) {
         self.stage_index = 0;
@@ -658,6 +678,34 @@ mod tests {
         assert_eq!(v.reason, Reason::ErrorRateTooHigh);
         assert_eq!(c.rollout().percentage, 0, "rollback must zero exposure");
         assert_eq!(c.gate().stage_index(), 0, "gate restarts for the next cycle");
+    }
+
+    /// A restart must not hand a failing rollout a clean slate.
+    #[test]
+    fn restored_streak_is_remembered() {
+        let mut g = HealthGate::new(vec![stage()], 3).unwrap();
+        let bad = || HealthSnapshot::new(200, 50, vec![10.0; 200]);
+        g.observe(bad(), ready());
+        g.observe(bad(), ready());
+        assert_eq!(g.consecutive_failures(), 2);
+
+        // Simulate a process restart: new gate, persisted streak.
+        let mut restored = HealthGate::new(vec![stage()], 3).unwrap();
+        restored.restore_streak(2);
+        assert_eq!(restored.consecutive_failures(), 2);
+        assert_eq!(
+            restored.observe(bad(), ready()).decision,
+            Decision::Rollback,
+            "the third failure must still roll back after a restart"
+        );
+    }
+
+    #[test]
+    fn restored_stage_position_is_clamped() {
+        let mut g = HealthGate::standard(2).unwrap();
+        assert_eq!(g.restore_stage(2).percentage, 50);
+        // A stage list shortened between releases must not panic.
+        assert_eq!(g.restore_stage(99).percentage, 100);
     }
 
     #[test]
