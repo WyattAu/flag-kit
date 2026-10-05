@@ -41,6 +41,7 @@ pub mod eval;
 pub mod flag;
 
 /// Flag lifecycle: rollout cycles, staleness policy, health-gated rollout.
+pub mod gate;
 pub mod lifecycle;
 
 /// OpenFeature Remote Evaluation Protocol (OFREP) wire types.
@@ -51,6 +52,10 @@ pub mod store;
 pub use error::{FlagError, Result};
 pub use eval::{bucket, bucket_with_org, Evaluator};
 pub use flag::{Flag, FlagChange, FlagName};
+pub use gate::{
+    Decision, HealthGate, HealthSnapshot, Reason as GateReason, RolloutController, Stage, StageError,
+    Verdict,
+};
 pub use ofrep::{
     BulkEntry, BulkEvaluationFailure, BulkEvaluationSuccess, Context, ErrorCode,
     EvaluationFailure, EvaluationRequest, EvaluationSuccess, FlagNotFound, FlagValue, Reason,

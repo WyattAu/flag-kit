@@ -467,6 +467,20 @@ impl Rollout {
         Ok(())
     }
 
+    /// Returns to zero exposure and clears the high water mark, keeping the
+    /// cohort salt.
+    ///
+    /// Distinct from [`Self::rollback`], which lowers exposure while
+    /// remembering how far the rollout got. After a rollback the gate
+    /// restarts from the first stage, so the high water mark must go too —
+    /// otherwise re-promoting to 5% would be rejected as a regression and
+    /// the rollout could never climb again. The salt is kept so the same
+    /// subjects are re-tested rather than a fresh cohort appearing.
+    pub fn reset_exposure(&mut self) {
+        self.percentage = 0;
+        self.high_water_mark = 0;
+    }
+
     /// Starts a new rollout cycle with a fresh cohort.
     ///
     /// The high water mark resets too: a new cycle is a new experiment and
@@ -765,6 +779,21 @@ mod tests {
         r.rollback(0).unwrap();
         assert_eq!(r.percentage, 0);
         assert_eq!(r.high_water_mark(), 50, "rollback keeps the mark");
+    }
+
+    #[test]
+    fn reset_exposure_clears_the_mark_but_keeps_the_cohort() {
+        let name = FlagName::new("my_flag").unwrap();
+        let mut r = Rollout::new(name, 50, "c1").unwrap();
+        r.advance(100).unwrap();
+        r.reset_exposure();
+        assert_eq!(r.percentage, 0);
+        assert_eq!(r.high_water_mark(), 0);
+        assert_eq!(r.salt, "c1", "the cohort must survive a rollback");
+        assert!(
+            r.advance(5).is_ok(),
+            "after a reset the rollout must be able to climb again"
+        );
     }
 
     #[test]
