@@ -39,12 +39,20 @@ pub mod error;
 pub mod eval;
 /// Flag types.
 pub mod flag;
+
+/// Flag lifecycle: rollout cycles, staleness policy, health-gated rollout.
+pub mod lifecycle;
 /// Storage backends.
 pub mod store;
 
 pub use error::{FlagError, Result};
 pub use eval::{bucket, bucket_with_org, Evaluator};
 pub use flag::{Flag, FlagChange, FlagName};
+pub use lifecycle::{
+    bucket_salted, bucket_salted_with_org, rollout_decision, AdvanceError, Classification,
+    FlagFacts, FlagKind, FlagPolicy, PercentError, Rollout, RolloutDecision, StaleSignal,
+    Staleness,
+};
 pub use store::{FlagStore, MemoryFlagStore};
 
 #[cfg(feature = "sqlite")]
