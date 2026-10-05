@@ -196,6 +196,13 @@ pub struct FlagFacts {
     pub percentage: u8,
     /// Days since the last evaluation, when the store records it.
     pub last_evaluated_age_days: Option<u32>,
+    /// Whether `last_evaluated_age_days` is authoritative for this source.
+    ///
+    /// `false` means the caller has no evaluation telemetry at all — a
+    /// static code scan, for instance. `None` then means "unknown", not
+    /// "never", and [`StaleSignal::NeverEvaluated`] must not fire: a source
+    /// that cannot see evaluations has no evidence that a flag is unused.
+    pub evaluation_tracked: bool,
 }
 
 /// Result of classifying a flag: a verdict plus its evidence.
@@ -277,6 +284,7 @@ impl FlagPolicy {
         }
 
         if self.stale_when_never_evaluated
+            && facts.evaluation_tracked
             && facts.last_evaluated_age_days.is_none()
             && facts.percentage == 0
         {
@@ -562,6 +570,7 @@ mod tests {
             last_changed_age_days: None,
             percentage,
             last_evaluated_age_days: Some(0),
+            evaluation_tracked: true,
         }
     }
 
@@ -632,6 +641,7 @@ mod tests {
             last_changed_age_days: Some(2),
             percentage: 10,
             last_evaluated_age_days: Some(1),
+            evaluation_tracked: true,
         };
         let c = FlagPolicy::default().classify(f);
         assert_eq!(c.staleness, Staleness::Fresh);
@@ -660,9 +670,31 @@ mod tests {
             last_changed_age_days: None,
             percentage: 0,
             last_evaluated_age_days: None,
+            evaluation_tracked: true,
         };
         let c = FlagPolicy::default().classify(f);
         assert!(c.signals.contains(&StaleSignal::NeverEvaluated));
+    }
+
+    /// A source with no evaluation telemetry (a static code scan) has no
+    /// evidence that a flag is unused. `None` means "unknown", so the
+    /// never-evaluated signal must stay silent rather than accuse.
+    #[test]
+    fn untracked_source_never_reports_never_evaluated() {
+        let f = FlagFacts {
+            kind: FlagKind::Release,
+            age_days: 1,
+            last_changed_age_days: None,
+            percentage: 0,
+            last_evaluated_age_days: None,
+            evaluation_tracked: false,
+        };
+        let c = FlagPolicy::default().classify(f);
+        assert!(
+            !c.signals.contains(&StaleSignal::NeverEvaluated),
+            "absence of telemetry is not evidence of absence of use"
+        );
+        assert_eq!(c.staleness, Staleness::Fresh);
     }
 
     #[test]
