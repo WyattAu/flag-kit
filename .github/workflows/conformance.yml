@@ -1,0 +1,13 @@
+name: conformance
+
+# Shared kit conformance harness: tests, doc tests, clippy -D warnings,
+# rustdoc, fmt, semver-checks against the last release, and an MSRV probe.
+# Source of truth: https://github.com/WyattAu/kit-conformance
+on: [push, pull_request]
+
+jobs:
+  kit:
+    uses: WyattAu/kit-conformance/.github/workflows/conformance.yml@main
+    with:
+      crate-path: .
+      msrv: "1.85"
