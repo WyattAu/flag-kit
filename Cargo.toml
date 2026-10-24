@@ -1,11 +1,11 @@
 [package]
 name = "flag-kit"
-version = "0.7.0"
+version = "0.7.1"
 edition = "2021"
 rust-version = "1.85"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/WyattAu/flag-kit"
-description = "Feature flags with rollout, targeting, and audit — deterministic percentage rollout, org targeting, and change history"
+description = "Feature flags: FlagSet rollout, targeting, audit, OTel"
 keywords = ["feature-flag", "rollout", "experiment", "targeting"]
 categories = ["config"]
 exclude = ["/target"]
