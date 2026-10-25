@@ -37,6 +37,23 @@ Changelog](https://keepachangelog.com/) — versions follow [semver](https://sem
 - config-knob behavior matrix: tests/config_matrix.rs pins every public knob to observable behavior — enabled (global eval flip), percentage 0/partial/100 (rollout outcome + bucket predicate across 500 users), set_percentage (flips evaluator predicate both ways, rejects out-of-range without corrupting state), with_created_at (default None vs set, both chrono and non-chrono builds), and pins the documented org_id-is-inert contract.
 
 
+## [1.0.0] - 2026-10-25
+
+### Declared stable
+
+First 1.0. `flag-kit` gates production features; this release commits the FlagSet rollout, targeting, audit, and OTel export surfaces as API-stable.
+
+### Guarantees from here on
+
+- Breaking changes to public items require a minor bump plus a `#[deprecated]`
+  window of at least one minor release.
+- MSRV bumps are minor releases, not patch releases.
+- `#![deny(missing_docs)]` and `#![forbid(unsafe_code)]` are enforced.
+
+### Explicitly not guaranteed
+
+- New targeting predicate kinds may arrive in minors behind new methods; existing predicate semantics will not change.
+
 ## [0.1.0] - 2026-09-03
 
 ### Added
