@@ -1,9 +1,9 @@
-# Requirements — flag-kit
+# Requirements: flag-kit
 
 Numbered, testable requirements. Every requirement maps to at least one named
 test or doc-comment contract; security-relevant items cite threat-model rows.
 
-Scope: Feature flags (`flag-kit`) — typed boolean/percentage/user-targeted flags with reload
+Scope: Feature flags (`flag-kit`); typed boolean/percentage/user-targeted flags with reload
 
 ## Functional
 

@@ -4,7 +4,7 @@
 [![Rust](https://img.shields.io/badge/rustc-1.85+-blue.svg)](https://www.rust-lang.org)
 [![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](LICENSE)
 
-Feature flags with rollout, targeting, and audit — deterministic percentage rollout, org targeting, and change history.
+Feature flags with rollout, targeting, and audit; deterministic percentage rollout, org targeting, and change history.
 
 ## Features
 
@@ -34,10 +34,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ## Feature Flags
 
-- `chrono` — `DateTime<Utc>` for `Flag.created_at`
-- `sqlite` — `SqliteFlagStore` with `rusqlite`
-- `regex` — regex validation for `FlagName`
-- `tracing` — instrumented store/eval
+- `chrono`; `DateTime<Utc>` for `Flag.created_at`
+- `sqlite`; `SqliteFlagStore` with `rusqlite`
+- `regex`; regex validation for `FlagName`
+- `tracing`; instrumented store/eval
 
 ## Stability
 

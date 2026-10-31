@@ -1,7 +1,7 @@
 # Changelog
 
 All notable changes to this project are documented here. Format: [Keep a
-Changelog](https://keepachangelog.com/) — versions follow [semver](https://semver.org).
+Changelog](https://keepachangelog.com/); versions follow [semver](https://semver.org).
 
 ## [Unreleased]
 
@@ -11,8 +11,8 @@ Changelog](https://keepachangelog.com/) — versions follow [semver](https://sem
 
 - **Flag-name validation is now delegated to `validkit::FlagName`**
   (dogfooding): the local ~40-line duplicate of the
-  `^[a-z][a-z0-9_]*$` rule — hand-rolled char loop plus a second
-  regex-engine copy behind the `regex` feature — is deleted. The
+  `^[a-z][a-z0-9_]*$` rule; hand-rolled char loop plus a second
+  regex-engine copy behind the `regex` feature; is deleted. The
   accept/reject set is unchanged and now pinned equal to validkit's by
   `tests/equivalence.rs` (historical oracle sets, exhaustive 1-char
   ASCII sweep, exhaustive 2-char mixed-alphabet sweep, structured
@@ -34,7 +34,7 @@ Changelog](https://keepachangelog.com/) — versions follow [semver](https://sem
 
 ### Added
 
-- config-knob behavior matrix: tests/config_matrix.rs pins every public knob to observable behavior — enabled (global eval flip), percentage 0/partial/100 (rollout outcome + bucket predicate across 500 users), set_percentage (flips evaluator predicate both ways, rejects out-of-range without corrupting state), with_created_at (default None vs set, both chrono and non-chrono builds), and pins the documented org_id-is-inert contract.
+- config-knob behavior matrix: tests/config_matrix.rs pins every public knob to observable behavior; enabled (global eval flip), percentage 0/partial/100 (rollout outcome + bucket predicate across 500 users), set_percentage (flips evaluator predicate both ways, rejects out-of-range without corrupting state), with_created_at (default None vs set, both chrono and non-chrono builds), and pins the documented org_id-is-inert contract.
 
 
 ## [1.0.0] - 2026-10-25

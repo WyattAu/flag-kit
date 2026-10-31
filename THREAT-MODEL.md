@@ -1,11 +1,11 @@
-# Threat Model — flag-kit
+# Threat Model: flag-kit
 
 Reference: STRIDE. Scope: the crate's public API surface. Trust boundary:
 (1) bytes/inputs entering public constructors and parsers, (2) concurrent
-callers sharing interior state. flag-kit is an in-process library — it opens
+callers sharing interior state. flag-kit is an in-process library; it opens
 no sockets and inherits the embedding process's trust domain.
 
-Purpose: Feature flags (`flag-kit`) — typed boolean/percentage/user-targeted flags with reload
+Purpose: Feature flags (`flag-kit`); typed boolean/percentage/user-targeted flags with reload
 
 ## Assets
 
@@ -19,7 +19,7 @@ Purpose: Feature flags (`flag-kit`) — typed boolean/percentage/user-targeted f
 | # | Threat | Category | Surface | Mitigation | Residual risk |
 |---|--------|----------|---------|------------|---------------|
 | T1 | Flip-flopping assignment across reloads | DoS | `reload` | snapshot swap: evaluation reads a consistent immutable snapshot | documented |
-| T2 | Crafted user key biases rollout | Spoofing | `hashing` | key hashing uses a fixed seed documented in code; attackers can compute it (documented residual risk — acceptable for rollout fairness, not security) | documented |
+| T2 | Crafted user key biases rollout | Spoofing | `hashing` | key hashing uses a fixed seed documented in code; attackers can compute it (documented residual risk; acceptable for rollout fairness, not security) | documented |
 
 ## Repudiation
 
